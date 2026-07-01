@@ -10,7 +10,8 @@ end
 
 vim.keymap.set({ "n", "i", "v" }, ctrl("s"), "<cmd>w<cr>", { desc = "Save file" })
 
-vim.keymap.set({ "n", "i" }, ctrl("z"), "u", { desc = "Undo" })
+vim.keymap.set("n", ctrl("z"), "u", { desc = "Undo" })
+vim.keymap.set("i", ctrl("z"), "<C-o>u", { desc = "Undo" })
 vim.keymap.set("n", ctrl("S-z"), "<C-r>", { desc = "Redo" })
 vim.keymap.set("i", ctrl("S-z"), "<C-o><C-r>", { desc = "Redo" })
 
