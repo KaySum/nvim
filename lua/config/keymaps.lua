@@ -16,3 +16,8 @@ vim.keymap.set("n", ctrl("S-z"), "<C-r>", { desc = "Redo" })
 vim.keymap.set("i", ctrl("S-z"), "<C-o><C-r>", { desc = "Redo" })
 
 vim.keymap.set("i", ctrl("v"), "<C-r>+", { desc = "Paste" })
+
+-- Toggle comment
+-- vim.keymap.set("n", ctrl("/"), "gcc", { desc = "Toggle Comment", remap = true })
+-- vim.keymap.set("v", ctrl("/"), "gc", { desc = "Toggle Comment", remap = true })
+vim.keymap.set("i", ctrl("/"), "<Cmd>normal gcc<CR>", { desc = "Toggle Comment" })
