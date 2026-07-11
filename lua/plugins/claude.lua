@@ -12,12 +12,4 @@ return {
       { "<C-.>", "<cmd>ClaudeCodeFocus<cr>", mode = { "n", "t", "v" }, desc = "Focus/Unfocus Claude" },
     },
   },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "<leader>a", group = "Claude Code" },
-      },
-    },
-  },
 }
