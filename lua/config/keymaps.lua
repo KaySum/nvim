@@ -6,9 +6,9 @@ vim.keymap.set({ "n", "v" }, "<C-d>", "<C-d>zz", { desc = "Half-page down and ce
 vim.keymap.set({ "n", "v" }, "<C-u>", "<C-u>zz", { desc = "Half-page up and center cursor" })
 
 local function ctrl(keys)
-	-- Cmd on macOS, Ctrl on Windows/Linux
-	local mod = vim.fn.has("mac") == 1 and "D" or "C"
-	return "<" .. mod .. "-" .. keys .. ">"
+  -- Cmd on macOS, Ctrl on Windows/Linux
+  local mod = vim.fn.has("mac") == 1 and "D" or "C"
+  return "<" .. mod .. "-" .. keys .. ">"
 end
 
 vim.keymap.set({ "n", "i", "v" }, ctrl("s"), "<cmd>w<cr>", { desc = "Save file" })
@@ -24,6 +24,3 @@ vim.keymap.set("i", ctrl("v"), "<C-r>+", { desc = "Paste" })
 -- vim.keymap.set("n", ctrl("/"), "gcc", { desc = "Toggle Comment", remap = true })
 -- vim.keymap.set("v", ctrl("/"), "gc", { desc = "Toggle Comment", remap = true })
 vim.keymap.set("i", ctrl("/"), "<Cmd>normal gcc<CR>", { desc = "Toggle Comment" })
-
-
-vim.keymap.set({ "n", "t", "v" }, "<C-.>", "<cmd>ClaudeCodeFocus<cr>", { desc = "Focus/Unfocus Claude" })
