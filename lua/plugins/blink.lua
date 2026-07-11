@@ -3,6 +3,11 @@ return {
   opts = {
     -- Tab accepts the highlighted completion (VS Code style) and jumps
     -- through snippet placeholders; falls back to normal Tab otherwise.
-    keymap = { preset = "super-tab" },
+    -- Enter also accepts when a completion is visible, falling back to a
+    -- normal newline otherwise.
+    keymap = {
+      preset = "super-tab",
+      ["<CR>"] = { "accept", "fallback" },
+    },
   },
 }
