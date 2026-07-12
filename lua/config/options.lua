@@ -13,3 +13,5 @@ vim.opt.wrap = true -- Wrap long lines
 vim.opt.linebreak = true -- Wrap at word boundaries, not mid-word
 vim.opt.breakindent = true -- Wrapped lines continue at the same indent (VS Code style)
 vim.opt.breakindentopt = "shift:" .. tab_width -- Indent wrapped lines one extra level, like VS Code's wrappingIndent: "indent"
+
+vim.opt.swapfile = false
