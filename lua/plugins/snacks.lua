@@ -1,6 +1,17 @@
 return {
   "folke/snacks.nvim",
   opts = {
+    styles = {
+      -- NOTE: lazygit's window dimmensions need to be explicitly set if the terminal's window dimmensions are explicitly changed
+      -- otherwise it uses the values from the terminal height/width
+      terminal = {
+        height = 0.45,
+      },
+      lazygit = {
+        width = 0.9,
+        height = 0.9,
+      },
+    },
     dashboard = {
       preset = {
         header = [[
