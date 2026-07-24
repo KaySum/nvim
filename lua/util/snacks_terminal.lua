@@ -10,42 +10,10 @@ local function focus_terminal(count)
   Snacks.terminal.focus(nil, { cwd = LazyVim.root(), count = count })
 end
 
--- Recently focused terminal ids, most-recent first. Updated on BufEnter and
--- filtered against live terminals, so killed ones are skipped over.
-local mru_ids = {}
-
-local function remember_terminal(id)
-  if not id then
-    return
-  end
-  for i, existing in ipairs(mru_ids) do
-    if existing == id then
-      table.remove(mru_ids, i)
-      break
-    end
-  end
-  table.insert(mru_ids, 1, id)
-end
-
--- Most recently focused terminal that is still open, if any. Callers with the
--- terminal list already in hand can pass it to avoid a second lookup.
-local function mru_terminal_id(terms)
-  local live = {}
-  for _, t in ipairs(terms or Snacks.terminal.list()) do
-    local id = term_meta(t.buf).id
-    if id then
-      live[id] = true
-    end
-  end
-  for _, id in ipairs(mru_ids) do
-    if live[id] then
-      return id
-    end
-  end
-end
+local mru_term_id
 
 local function focus_mru_terminal()
-  focus_terminal(vim.v.count > 0 and vim.v.count or mru_terminal_id() or 1)
+  focus_terminal(vim.v.count > 0 and vim.v.count or mru_term_id or 1)
 end
 
 local function open_terminal(id)
@@ -101,9 +69,9 @@ local function describe_terminal(buf, tree)
   return vim.trim((process or "") .. "  " .. term_cwd(buf))
 end
 
-local function terminal_label(t, tree, mru)
+local function terminal_label(t, tree)
   local id = term_meta(t.buf).id
-  local marker = id == mru and ACTIVE_MARKER or " "
+  local marker = id == mru_term_id and ACTIVE_MARKER or " "
   local name = vim.b[t.buf].terminal_name
   local label = name and ("[" .. name .. "] ") or ""
   return ("%s (%s)  %s%s"):format(marker, id or "?", label, describe_terminal(t.buf, tree))
@@ -118,11 +86,10 @@ local function pick_terminal(prompt, on_choice)
     return (term_meta(a.buf).id or 0) < (term_meta(b.buf).id or 0)
   end)
   local tree = process_tree()
-  local mru = mru_terminal_id(terms)
   vim.ui.select(terms, {
     prompt = prompt,
     format_item = function(t)
-      return terminal_label(t, tree, mru)
+      return terminal_label(t, tree)
     end,
   }, function(t)
     if t then
@@ -173,7 +140,7 @@ function M.setup()
   vim.api.nvim_create_autocmd("BufEnter", {
     group = vim.api.nvim_create_augroup("mru_terminal", { clear = true }),
     callback = function(ev)
-      remember_terminal(term_meta(ev.buf).id)
+      mru_term_id = term_meta(ev.buf).id or mru_term_id
     end,
   })
 
