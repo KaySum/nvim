@@ -15,3 +15,5 @@ vim.opt.breakindent = true -- Wrapped lines continue at the same indent (VS Code
 vim.opt.breakindentopt = "shift:" .. tab_width -- Indent wrapped lines one extra level, like VS Code's wrappingIndent: "indent"
 
 vim.opt.swapfile = false
+
+vim.opt.showtabline = 2 -- always show the bufferline/tabline; bufferline's auto-toggle is off (see plugins/bufferline.lua), so we own this value
