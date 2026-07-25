@@ -11,6 +11,7 @@ return {
       terminal = {
         height = 0.45,
         wo = { winbar = terminal.winbar },
+        on_win = terminal.on_win, -- strip winbar from floating terminals (e.g. lazygit)
       },
       lazygit = {
         width = 0.9,
