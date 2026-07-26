@@ -1,6 +1,6 @@
 return {
   {
-    "KaySum/nvim-agent-path-ref",
+    "KaySum/agent-path-ref.nvim",
     cmd = "AgentPathRef",
     keys = {
       { "<leader>ay", "<Plug>(AgentPathRef)", mode = { "n", "x" }, desc = "Yank @file reference" },

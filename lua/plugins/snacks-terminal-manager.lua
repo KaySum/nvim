@@ -10,7 +10,7 @@ for i = 1, 9 do
 end
 
 return {
-  "KaySum/nvim-snacks-terminal-manager",
+  "KaySum/snacks-terminal-manager.nvim",
   dependencies = { "folke/snacks.nvim" },
   lazy = false,
   opts = {
