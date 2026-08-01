@@ -10,23 +10,57 @@ return {
       -- colored. The per-line staged/unstaged classification lives in the shared
       -- util.git_hunks module; here we just map it to neominimap annotations.
       local id_by_type = { add = 1, change = 2, delete = 3 }
+
+      -- gitsigns skips GitSignsUpdate when only staged hunks change (e.g. after a
+      -- commit), so init() emits this to keep the staged markers fresh.
+      local STAGED_EVENT = "NeominimapGitStaged"
+
+      local function refresh_on(pattern)
+        return {
+          event = "User",
+          opts = {
+            pattern = pattern,
+            desc = "Update git staged/unstaged annotations",
+            get_buffers = function(args)
+              return args.data and tonumber(args.data.buffer) or nil
+            end,
+          },
+        }
+      end
+
+      local function emit_on_staged_change()
+        local ok, manager = pcall(require, "gitsigns.manager")
+        if not ok then
+          return
+        end
+        manager.on_update(function(ctx)
+          if ctx.hunks_staged_changed then
+            vim.api.nvim_exec_autocmds("User", {
+              pattern = STAGED_EVENT,
+              modeline = false,
+              data = { buffer = ctx.bufnr },
+            })
+          end
+        end)
+      end
+
       local git_staged_unstaged = {
         name = "Git Staged/Unstaged",
         mode = "sign",
         namespace = vim.api.nvim_create_namespace("neominimap_git_staged_unstaged"),
-        autocmds = {
-          {
-            event = "User",
-            opts = {
+        autocmds = { refresh_on("GitSignsUpdate"), refresh_on(STAGED_EVENT) },
+        init = function()
+          -- gitsigns may attach after neominimap loads; hook once it's up.
+          if package.loaded["gitsigns.manager"] then
+            emit_on_staged_change()
+          else
+            vim.api.nvim_create_autocmd("User", {
               pattern = "GitSignsUpdate",
-              desc = "Update git staged/unstaged annotations",
-              get_buffers = function(args)
-                return args.data and tonumber(args.data.buffer) or nil
-              end,
-            },
-          },
-        },
-        init = function() end,
+              once = true,
+              callback = emit_on_staged_change,
+            })
+          end
+        end,
         get_annotations = function(bufnr)
           local git = require("util.git_hunks")
           local annotations = {}
