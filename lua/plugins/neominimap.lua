@@ -51,6 +51,16 @@ return {
             fix_width = true, -- keep the width stable
             close_if_last_window = true,
           },
+          -- Don't open the split for tabs that only hold the snacks dashboard
+          -- (exclude_filetypes only blanks the map; the split still opens).
+          tab_filter = function(tabid)
+            for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabid)) do
+              if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "snacks_dashboard" then
+                return false
+              end
+            end
+            return true
+          end,
           git = { enabled = false }, -- replaced by the custom staged/unstaged handler below
           search = { enabled = true },
           mark = { enabled = true },
