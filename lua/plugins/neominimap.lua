@@ -101,7 +101,7 @@ return {
             annotations[#annotations + 1] = {
               lnum = lnum,
               end_lnum = lnum,
-              priority = 30, -- above git signs; conflicts are the urgent thing
+              priority = 110, -- above diagnostics (ERROR = 100); conflicts are the urgent thing
               highlight = hl,
             }
           end
