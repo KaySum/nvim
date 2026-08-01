@@ -6,13 +6,10 @@ return {
       { "<leader>uM", "<cmd>Neominimap Toggle<cr>", desc = "Toggle Minimap" },
     },
     init = function()
-      -- Custom git handler that shows both staged and unstaged hunks, distinctly
-      -- colored. The per-line staged/unstaged classification lives in the shared
-      -- util.git_hunks module; here we just map it to neominimap annotations.
+      -- Shows staged and unstaged hunks distinctly; classification lives in util.git_hunks.
       local id_by_type = { add = 1, change = 2, delete = 3 }
 
-      -- gitsigns skips GitSignsUpdate when only staged hunks change (e.g. after a
-      -- commit), so init() emits this to keep the staged markers fresh.
+      -- Fired by init()'s gitsigns hook; covers staged-only changes GitSignsUpdate skips (e.g. a commit).
       local STAGED_EVENT = "NeominimapGitStaged"
 
       local function refresh_on(pattern)
@@ -77,6 +74,33 @@ return {
         end,
       }
 
+      -- Conflict regions colored per side; markers are buffer text, so edits refresh it (no autocmds).
+      local conflict_hl = {
+        current = "GitConflictCurrent",
+        ancestor = "GitConflictAncestor",
+        incoming = "GitConflictIncoming",
+      }
+      local git_conflict = {
+        name = "Git Conflict",
+        mode = "line",
+        namespace = vim.api.nvim_create_namespace("neominimap_git_conflict"),
+        autocmds = {},
+        init = function() end,
+        get_annotations = function(bufnr)
+          local conflict = require("util.git_conflict")
+          local annotations = {}
+          for lnum, side in pairs(conflict.line_status(bufnr)) do
+            annotations[#annotations + 1] = {
+              lnum = lnum,
+              end_lnum = lnum,
+              priority = 30, -- above git signs; conflicts are the urgent thing
+              highlight = conflict_hl[side],
+            }
+          end
+          return annotations
+        end,
+      }
+
       vim.g.neominimap = function()
         return {
           layout = "split", -- real split window (reserves space, never overlaps text)
@@ -95,10 +119,15 @@ return {
             end
             return true
           end,
+          -- Reserve the sign column so the map never reflows when git signs come/go.
+          -- NOTE: permanent ~2-cell cost, and caps signs at 1/row — use "auto:1-2" if a 2nd sign handler is added.
+          winopt = function(opt)
+            opt.signcolumn = "yes:1"
+          end,
           git = { enabled = false }, -- replaced by the custom staged/unstaged handler below
           search = { enabled = true },
           mark = { enabled = true },
-          handlers = { git_staged_unstaged },
+          handlers = { git_staged_unstaged, git_conflict },
         }
       end
     end,
