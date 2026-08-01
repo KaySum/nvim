@@ -74,27 +74,35 @@ return {
         end,
       }
 
-      -- Conflict regions colored per side; markers are buffer text, so edits refresh it (no autocmds).
-      local conflict_hl = {
-        current = "GitConflictCurrent",
-        ancestor = "GitConflictAncestor",
-        incoming = "GitConflictIncoming",
-      }
+      -- Conflict regions mirror git-conflict.nvim's own highlights (read from its
+      -- extmarks in util.git_conflict). Edits refresh via neominimap's per-change
+      -- pass; the detect/resolve events cover its async highlighting on open.
       local git_conflict = {
         name = "Git Conflict",
         mode = "line",
         namespace = vim.api.nvim_create_namespace("neominimap_git_conflict"),
-        autocmds = {},
+        autocmds = {
+          {
+            event = "User",
+            opts = {
+              pattern = { "GitConflictDetected", "GitConflictResolved" },
+              desc = "Update git conflict annotations",
+              get_buffers = function(args)
+                return args.buf
+              end,
+            },
+          },
+        },
         init = function() end,
         get_annotations = function(bufnr)
           local conflict = require("util.git_conflict")
           local annotations = {}
-          for lnum, side in pairs(conflict.line_status(bufnr)) do
+          for lnum, hl in pairs(conflict.line_status(bufnr)) do
             annotations[#annotations + 1] = {
               lnum = lnum,
               end_lnum = lnum,
               priority = 30, -- above git signs; conflicts are the urgent thing
-              highlight = conflict_hl[side],
+              highlight = hl,
             }
           end
           return annotations
