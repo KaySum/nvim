@@ -39,6 +39,24 @@ return {
     -- Load eagerly so oil takes over as the default directory handler (replaces netrw).
     lazy = false,
     dependencies = { "nvim-mini/mini.icons" },
+    -- Oil's buffer creation races which-key's trigger setup, so the leader trigger
+    -- never lands and <Space> falls through as a literal space. Re-attach on entry.
+    init = function()
+      -- NOTE: FileType only fires on buffer creation. If you leave an oil buffer and which-key
+      -- clears its state, re-entry won't re-attach; switch to BufEnter (ft-gated) if that recurs.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "oil",
+        callback = function(ev)
+          vim.schedule(function()
+            -- NOTE: which-key.buf is internal API (no public buffer-refresh exists); the pcall
+            -- means an upstream change would silently no-op, re-breaking leader here. Revisit on bumps.
+            pcall(function()
+              require("which-key.buf").get({ buf = ev.buf, update = true })
+            end)
+          end)
+        end,
+      })
+    end,
     opts = {
       view_options = {
         show_hidden = true,
