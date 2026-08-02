@@ -12,7 +12,20 @@ local function close_oil()
   end)
 end
 
+local function is_editable(bufnr)
+  return vim.bo[bufnr].buftype == "" or vim.bo[bufnr].filetype == "oil"
+end
+
 local function toggle_oil(dir)
+  -- Oil replaces the focused window's buffer; from a plugin window (e.g. the snacks explorer) route to where we came from so the layout doesn't collapse.
+  if not is_editable(vim.api.nvim_get_current_buf()) then
+    local prev = vim.fn.win_getid(vim.fn.winnr("#"))
+    if prev == 0 or not is_editable(vim.api.nvim_win_get_buf(prev)) then
+      return
+    end
+    vim.api.nvim_set_current_win(prev)
+  end
+
   if vim.bo.filetype == "oil" then
     close_oil()
   else
