@@ -19,6 +19,21 @@ local function setup_conflict_diagnostics()
   })
 end
 
+-- git-conflict's watcher misses merge/rebase conflicts; re-check on reload, then repaint twice as its async refresh lands.
+local function setup_conflict_refresh()
+  vim.api.nvim_create_autocmd("FileChangedShellPost", {
+    group = vim.api.nvim_create_augroup("git_conflict_refresh", { clear = true }),
+    callback = function()
+      pcall(vim.cmd.GitConflictRefresh)
+      for _, delay in ipairs({ 50, 300 }) do
+        vim.defer_fn(function()
+          vim.cmd("redraw")
+        end, delay)
+      end
+    end,
+  })
+end
+
 return {
   {
     "akinsho/git-conflict.nvim",
@@ -32,7 +47,10 @@ return {
       -- the API, and upstream is unmaintained. setup_conflict_diagnostics reimplements it.
       default_mappings = false,
     },
-    init = setup_conflict_diagnostics,
+    init = function()
+      setup_conflict_diagnostics()
+      setup_conflict_refresh()
+    end,
     keys = {
       { "<leader>gxo", "<cmd>GitConflictChooseOurs<cr>", desc = "Choose Ours (current)" },
       { "<leader>gxt", "<cmd>GitConflictChooseTheirs<cr>", desc = "Choose Theirs (incoming)" },
