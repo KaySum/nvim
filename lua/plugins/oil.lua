@@ -47,6 +47,9 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "oil",
         callback = function(ev)
+          -- Oil's buffer isn't buftype "" so snacks treats it as a non-file and won't
+          -- restore focus here on explorer close; mark it a valid main window.
+          vim.b[ev.buf].snacks_main = true
           vim.schedule(function()
             -- NOTE: which-key.buf is internal API (no public buffer-refresh exists); the pcall
             -- means an upstream change would silently no-op, re-breaking leader here. Revisit on bumps.
