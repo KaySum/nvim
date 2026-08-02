@@ -9,5 +9,8 @@ return {
       preset = "super-tab",
       ["<CR>"] = { "accept", "fallback" },
     },
+    enabled = function()
+      return vim.bo.filetype ~= "markdown"
+    end,
   },
 }
