@@ -1,3 +1,12 @@
+local function has_conflict_markers(buf)
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+    if vim.startswith(line, "<<<<<<<") then
+      return true
+    end
+  end
+  return false
+end
+
 -- Reimplements git-conflict's `disable_diagnostics` with the Neovim 0.11+ API:
 -- suppress LSP diagnostics inside a buffer while it has conflicts, restore on resolve.
 -- git-conflict still fires these User events correctly; only its own handler is broken.
@@ -19,11 +28,15 @@ local function setup_conflict_diagnostics()
   })
 end
 
--- git-conflict's watcher misses merge/rebase conflicts; re-check on reload, then repaint twice as its async refresh lands.
+-- git-conflict's watcher misses merge/rebase conflicts; when a reload brings in
+-- markers, re-check and repaint twice as its async refresh lands.
 local function setup_conflict_refresh()
   vim.api.nvim_create_autocmd("FileChangedShellPost", {
     group = vim.api.nvim_create_augroup("git_conflict_refresh", { clear = true }),
-    callback = function()
+    callback = function(args)
+      if not has_conflict_markers(args.buf) then
+        return
+      end
       pcall(vim.cmd.GitConflictRefresh)
       for _, delay in ipairs({ 50, 300 }) do
         vim.defer_fn(function()
