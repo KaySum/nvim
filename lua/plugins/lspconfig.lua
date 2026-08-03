@@ -1,11 +1,8 @@
 return {
   {
     "neovim/nvim-lspconfig",
-    opts = {
-      diagnostics = {
-        virtual_text = false,
-        virtual_lines = true,
-      },
-    },
+    init = function()
+      require("config.overrides.diagnostic_priority").setup()
+    end,
   },
 }

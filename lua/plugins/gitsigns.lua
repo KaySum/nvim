@@ -5,8 +5,8 @@ return {
       current_line_blame = true,
       current_line_blame_opts = {
         delay = 300,
-        -- outrank noice's search-count overlay, which inherits nvim's default extmark priority (4096)
-        virt_text_priority = 4097,
+        -- See lua/config/overrides/virtual_text_priority.lua for the ordering rationale.
+        virt_text_priority = require("config.overrides.virtual_text_priority").git_blame,
       },
     },
   },
