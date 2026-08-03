@@ -22,6 +22,30 @@ return {
   ██║  ██╗██║  ██║   ██║   ███████║╚██████╔╝██║ ╚═╝ ██║
   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝ ╚═════╝ ╚═╝     ╚═╝]],
       },
+      sections = {
+        {
+          {
+            section = "header",
+          },
+          {
+            section = "startup",
+            padding = 1,
+          },
+        },
+        {
+          pane = 2,
+          {
+            section = "keys",
+            indent = 2,
+            padding = 1,
+          },
+          {
+            section = "projects",
+            indent = 2,
+            padding = 1,
+          },
+        },
+      },
     },
   },
 }
