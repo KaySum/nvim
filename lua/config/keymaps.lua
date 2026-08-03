@@ -4,8 +4,6 @@
 
 vim.keymap.set({ "n", "v" }, "<C-d>", "<C-d>zz", { desc = "Half-page down and center cursor" })
 vim.keymap.set({ "n", "v" }, "<C-u>", "<C-u>zz", { desc = "Half-page up and center cursor" })
-vim.keymap.set({ "n", "v" }, "<C-f>", "<C-f>zz", { desc = "Full-page down and center cursor" })
-vim.keymap.set({ "n", "v" }, "<C-b>", "<C-b>zz", { desc = "Full-page up and center cursor" })
 
 local function ctrl(keys)
   -- Cmd on macOS, Ctrl on Windows/Linux
