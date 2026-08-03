@@ -1,3 +1,5 @@
+local disabled_filetypes = { "markdown", "oil" }
+
 return {
   "saghen/blink.cmp",
   opts = {
@@ -10,7 +12,7 @@ return {
       ["<CR>"] = { "accept", "fallback" },
     },
     enabled = function()
-      return vim.bo.filetype ~= "markdown"
+      return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype)
     end,
   },
 }
