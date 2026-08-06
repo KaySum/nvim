@@ -12,6 +12,11 @@ return {
       -- Fired by init()'s gitsigns hook; covers staged-only changes GitSignsUpdate skips (e.g. a commit).
       local STAGED_EVENT = "NeominimapGitStaged"
 
+      local DIAGNOSTIC_TOGGLE_EVENT = "NeominimapDiagnosticToggled"
+
+      -- The built-in builds its highlight group from config.diagnostic.mode; both must agree.
+      local DIAGNOSTIC_MODE = "line"
+
       local function refresh_on(pattern)
         return {
           event = "User",
@@ -109,6 +114,50 @@ return {
         end,
       }
 
+      -- Mirrors <leader>ud: the built-in keeps painting, as vim.diagnostic.get() ignores display state.
+      local diagnostic = {
+        name = "Diagnostic",
+        mode = DIAGNOSTIC_MODE,
+        namespace = vim.api.nvim_create_namespace("neominimap_diagnostic_synced"),
+        autocmds = {
+          {
+            event = "DiagnosticChanged",
+            opts = {
+              desc = "Update diagnostic annotations",
+              get_buffers = function(args)
+                return args.buf
+              end,
+            },
+          },
+          refresh_on(DIAGNOSTIC_TOGGLE_EVENT),
+        },
+        init = function()
+          -- enable() fires no DiagnosticChanged, but these do — on every publish too, so only emit on flips.
+          local function on_toggle(_, bufnr)
+            if not vim.api.nvim_buf_is_valid(bufnr) then
+              return
+            end
+            local state = vim.diagnostic.is_enabled({ bufnr = bufnr })
+            if vim.b[bufnr].neominimap_diag_enabled == state then
+              return
+            end
+            vim.b[bufnr].neominimap_diag_enabled = state
+            vim.api.nvim_exec_autocmds("User", {
+              pattern = DIAGNOSTIC_TOGGLE_EVENT,
+              modeline = false,
+              data = { buffer = bufnr },
+            })
+          end
+          vim.diagnostic.handlers.neominimap_sync = { show = on_toggle, hide = on_toggle }
+        end,
+        get_annotations = function(bufnr)
+          if not vim.diagnostic.is_enabled({ bufnr = bufnr }) then
+            return {}
+          end
+          return require("neominimap.map.handlers.builtins.diagnostic").get_annotations(bufnr)
+        end,
+      }
+
       vim.g.neominimap = function()
         return {
           layout = "split", -- real split window (reserves space, never overlaps text)
@@ -133,9 +182,10 @@ return {
             opt.signcolumn = "yes:1"
           end,
           git = { enabled = false }, -- replaced by the custom staged/unstaged handler below
+          diagnostic = { enabled = false, mode = DIAGNOSTIC_MODE }, -- replaced by the <leader>ud-aware handler below
           search = { enabled = true },
           mark = { enabled = true },
-          handlers = { git_staged_unstaged, git_conflict },
+          handlers = { git_staged_unstaged, git_conflict, diagnostic },
         }
       end
     end,
