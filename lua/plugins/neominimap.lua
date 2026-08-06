@@ -17,14 +17,14 @@ return {
       -- The built-in builds its highlight group from config.diagnostic.mode; both must agree.
       local DIAGNOSTIC_MODE = "line"
 
-      local function refresh_on(pattern)
+      local function refresh_on(event, pattern)
         return {
-          event = "User",
+          event = event,
           opts = {
             pattern = pattern,
-            desc = "Update git staged/unstaged annotations",
+            desc = "Refresh minimap annotations",
             get_buffers = function(args)
-              return args.data and tonumber(args.data.buffer) or nil
+              return args.data and tonumber(args.data.buffer) or args.buf
             end,
           },
         }
@@ -50,7 +50,7 @@ return {
         name = "Git Staged/Unstaged",
         mode = "sign",
         namespace = vim.api.nvim_create_namespace("neominimap_git_staged_unstaged"),
-        autocmds = { refresh_on("GitSignsUpdate"), refresh_on(STAGED_EVENT) },
+        autocmds = { refresh_on("User", "GitSignsUpdate"), refresh_on("User", STAGED_EVENT) },
         init = function()
           -- gitsigns may attach after neominimap loads; hook once it's up.
           if package.loaded["gitsigns.manager"] then
@@ -86,18 +86,7 @@ return {
         name = "Git Conflict",
         mode = "line",
         namespace = vim.api.nvim_create_namespace("neominimap_git_conflict"),
-        autocmds = {
-          {
-            event = "User",
-            opts = {
-              pattern = { "GitConflictDetected", "GitConflictResolved" },
-              desc = "Update git conflict annotations",
-              get_buffers = function(args)
-                return args.buf
-              end,
-            },
-          },
-        },
+        autocmds = { refresh_on("User", { "GitConflictDetected", "GitConflictResolved" }) },
         init = function() end,
         get_annotations = function(bufnr)
           local conflict = require("util.git_conflict")
@@ -119,18 +108,7 @@ return {
         name = "Diagnostic",
         mode = DIAGNOSTIC_MODE,
         namespace = vim.api.nvim_create_namespace("neominimap_diagnostic_synced"),
-        autocmds = {
-          {
-            event = "DiagnosticChanged",
-            opts = {
-              desc = "Update diagnostic annotations",
-              get_buffers = function(args)
-                return args.buf
-              end,
-            },
-          },
-          refresh_on(DIAGNOSTIC_TOGGLE_EVENT),
-        },
+        autocmds = { refresh_on("DiagnosticChanged"), refresh_on("User", DIAGNOSTIC_TOGGLE_EVENT) },
         init = function()
           -- enable() fires no DiagnosticChanged, but these do — on every publish too, so only emit on flips.
           local function on_toggle(_, bufnr)
