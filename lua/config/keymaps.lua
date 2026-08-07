@@ -57,3 +57,6 @@ map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 
 -- Add any additional keymaps here
+
+map({ "n", "v" }, "<C-d>", "<C-d>zz", { desc = "Half-page down and center cursor" })
+map({ "n", "v" }, "<C-u>", "<C-u>zz", { desc = "Half-page up and center cursor" })
