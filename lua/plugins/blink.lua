@@ -1,4 +1,4 @@
-local disabled_filetypes = { "markdown", "oil" }
+local disabled_filetypes = { "text", "markdown", "oil" }
 
 return {
   "saghen/blink.cmp",
