@@ -12,6 +12,13 @@ return {
         height = 0.9,
       },
     },
+    picker = {
+      sources = {
+        explorer = {
+          auto_close = true,
+        },
+      },
+    },
     dashboard = {
       preset = {
         header = [[
