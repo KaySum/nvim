@@ -54,3 +54,22 @@ opt.grepprg = "rg --vimgrep"
 opt.grepformat = "%f:%l:%c:%m"
 
 opt.foldlevel = 99
+
+-- Add any additional options here
+
+-- Factor applied to shiftwidth for the wrapped-line indent (VS Code deepIndent = 2).
+-- Global so a re-detecting plugin (vim-sleuth) can reuse it when it recomputes breakindentopt.
+vim.g.wrap_indent_multiplier = 2
+
+local tab_width = 4
+
+opt.expandtab = false -- use tabs instead of spaces
+opt.tabstop = tab_width
+opt.shiftwidth = tab_width
+opt.softtabstop = tab_width
+
+opt.wrap = true
+opt.breakindent = true -- wrapped lines continue at the same indent (VS Code style)
+opt.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * tab_width
+
+opt.swapfile = false
