@@ -8,6 +8,11 @@ return {
     end,
     completion = {
       list = { selection = { preselect = false, auto_insert = false } },
+      menu = {
+        draw = {
+          columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
+        },
+      },
     },
     sources = {
       providers = {
