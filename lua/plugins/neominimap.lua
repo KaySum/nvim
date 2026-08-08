@@ -168,4 +168,13 @@ return {
       end
     end,
   },
+
+  {
+    "folke/which-key.nvim",
+    opts = {
+      -- The minimap fires BufEnter without ever being focused, which parks which-key's
+      -- buffer-local <leader> trigger on it and leaves the focused buffer without one.
+      disable = { ft = { "neominimap" } },
+    },
+  },
 }
