@@ -28,6 +28,27 @@ local function setup_conflict_diagnostics()
   })
 end
 
+-- git-conflict paints onto the focused buffer rather than the one it parsed, so redrawing a
+-- conflicted buffer behind a float (lazygit mid-rebase) stamps the markers over that float.
+local function patch_conflict_paint_target()
+  local set_provider = vim.api.nvim_set_decoration_provider
+  ---@diagnostic disable-next-line: duplicate-set-field
+  vim.api.nvim_set_decoration_provider = function(ns, handlers)
+    local on_win = handlers.on_win
+    if not on_win or ns ~= vim.api.nvim_get_namespaces()["git-conflict"] then
+      return set_provider(ns, handlers)
+    end
+    vim.api.nvim_set_decoration_provider = set_provider -- git-conflict registers once
+    handlers.on_win = function(_, winid, bufnr, ...)
+      if bufnr ~= vim.api.nvim_get_current_buf() then
+        return false
+      end
+      return on_win(_, winid, bufnr, ...)
+    end
+    return set_provider(ns, handlers)
+  end
+end
+
 -- git-conflict's watcher misses merge/rebase conflicts; when a reload brings in
 -- markers, re-check and repaint twice as its async refresh lands.
 local function setup_conflict_refresh()
@@ -61,6 +82,7 @@ return {
       default_mappings = false,
     },
     init = function()
+      patch_conflict_paint_target()
       setup_conflict_diagnostics()
       setup_conflict_refresh()
     end,
