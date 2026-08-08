@@ -4,6 +4,11 @@ return {
     "folke/sidekick.nvim",
     opts = {
       nes = { enabled = false },
+      cli = {
+        tools = {
+          claude = { cmd = { "claude", "--continue" } },
+        },
+      },
     },
     config = function(_, opts)
       -- Start AI CLIs in the project root by default, but don't override the
