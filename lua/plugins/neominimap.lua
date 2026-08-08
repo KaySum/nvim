@@ -167,6 +167,17 @@ return {
         }
       end
     end,
+    config = function()
+      -- Fixes: windows split off the minimap inherit its options (no line numbers, no wrap, its
+      -- highlights, ...), and buffers shown there keep them everywhere they are reopened.
+      -- NOTE: internal API, but the patch stays correct if upstream fixes this itself.
+      local win_util = require("neominimap.window.util")
+      local set_winopt = win_util.set_winopt
+      ---@diagnostic disable-next-line: duplicate-set-field
+      win_util.set_winopt = function(_, winid)
+        set_winopt(vim.wo[winid][0], winid)
+      end
+    end,
   },
 
   {
