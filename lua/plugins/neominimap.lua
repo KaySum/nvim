@@ -168,6 +168,43 @@ return {
       end
     end,
     config = function()
+      -- No unfocusable option, and `focusable` is float-only, so bounce the cursor back out.
+      -- `Neominimap Focus` still reaches it: the plugin switches windows with noautocmd.
+      local before ---@type integer? <C-w>p's target, banked before a detour
+
+      local function is_minimap(win)
+        return vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "neominimap"
+      end
+
+      local function usable(win)
+        return win and win ~= 0 and vim.api.nvim_win_is_valid(win) and not is_minimap(win)
+      end
+
+      local function prev_win()
+        return vim.fn.win_getid(vim.fn.winnr("#"))
+      end
+
+      vim.api.nvim_create_autocmd("WinEnter", {
+        desc = "Keep the cursor out of the minimap",
+        nested = true, -- let the window we land on see its own WinEnter
+        callback = function()
+          if not is_minimap(vim.api.nvim_get_current_win()) then
+            before = prev_win() -- this window's own <C-w>p target
+            return
+          end
+          local back = prev_win()
+          if not usable(back) then
+            vim.cmd.wincmd("w") -- nowhere to return to; any real window beats staying
+            return
+          end
+          -- Return via `before` so <C-w>p still points where it did.
+          if usable(before) and before ~= back then
+            vim.cmd("noautocmd call win_gotoid(" .. before .. ")")
+          end
+          vim.api.nvim_set_current_win(back)
+        end,
+      })
+
       -- Fixes: windows split off the minimap inherit its options (no line numbers, no wrap, its
       -- highlights, ...), and buffers shown there keep them everywhere they are reopened.
       -- NOTE: internal API, but the patch stays correct if upstream fixes this itself.
