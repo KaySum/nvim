@@ -17,10 +17,6 @@ return {
         return resolve_cwd(session)
       end
       require("sidekick").setup(opts)
-
-      -- Claude is the only CLI in use, so keep it the only choice and skip the picker
-      local Config = require("sidekick.config")
-      Config.cli.tools = { claude = Config.cli.tools.claude }
     end,
   },
 
