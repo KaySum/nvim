@@ -170,14 +170,19 @@ return {
     config = function()
       -- No unfocusable option, and `focusable` is float-only, so bounce the cursor back out.
       -- `Neominimap Focus` still reaches it: the plugin switches windows with noautocmd.
-      local before ---@type integer? <C-w>p's target, banked before a detour
-
       local function is_minimap(win)
         return vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "neominimap"
       end
 
+      -- Everything here must stay inside the current tabpage: hopping tabpages from a WinEnter
+      -- re-enters the tab switch Neovim is already running and leaves that tab's recorded
+      -- current window dangling, which segfaults the next redraw or `:tab drop` (lazygit's `e`).
       local function usable(win)
-        return win and win ~= 0 and vim.api.nvim_win_is_valid(win) and not is_minimap(win)
+        return win
+          and win ~= 0
+          and vim.api.nvim_win_is_valid(win)
+          and vim.api.nvim_win_get_tabpage(win) == vim.api.nvim_get_current_tabpage()
+          and not is_minimap(win)
       end
 
       local function prev_win()
@@ -186,22 +191,28 @@ return {
 
       vim.api.nvim_create_autocmd("WinEnter", {
         desc = "Keep the cursor out of the minimap",
-        nested = true, -- let the window we land on see its own WinEnter
         callback = function()
           if not is_minimap(vim.api.nvim_get_current_win()) then
-            before = prev_win() -- this window's own <C-w>p target
+            vim.t.minimap_before = prev_win() -- this window's own <C-w>p target
             return
           end
-          local back = prev_win()
-          if not usable(back) then
-            vim.cmd.wincmd("w") -- nowhere to return to; any real window beats staying
-            return
-          end
-          -- Return via `before` so <C-w>p still points where it did.
-          if usable(before) and before ~= back then
-            vim.cmd("noautocmd call win_gotoid(" .. before .. ")")
-          end
-          vim.api.nvim_set_current_win(back)
+          local back, before = prev_win(), vim.t.minimap_before
+          -- Deferred: switching windows here would re-enter the window/tabpage change Neovim
+          -- is still in the middle of, leaving a freed window as a tabpage's current one.
+          vim.schedule(function()
+            if not is_minimap(vim.api.nvim_get_current_win()) then
+              return -- already moved on
+            end
+            if not usable(back) then
+              vim.cmd.wincmd("w") -- nowhere to return to; any real window beats staying
+              return
+            end
+            -- Return via `before` so <C-w>p still points where it did.
+            if usable(before) and before ~= back then
+              vim.cmd("noautocmd call win_gotoid(" .. before .. ")")
+            end
+            vim.api.nvim_set_current_win(back)
+          end)
         end,
       })
 
