@@ -13,6 +13,20 @@ return {
       lazygit = {
         width = 0.9,
         height = 0.9,
+        -- a hidden lazygit stays alive and keeps piping diffs through delta on every refresh,
+        -- so quit it; the delay lets the nvim-remote edit preset open the file first
+        on_buf = function(self)
+          vim.api.nvim_create_autocmd("BufHidden", {
+            buffer = self.buf,
+            callback = function()
+              vim.defer_fn(function()
+                if self:buf_valid() and vim.fn.bufwinid(self.buf) == -1 then
+                  vim.api.nvim_chan_send(vim.b[self.buf].terminal_job_id, "q")
+                end
+              end, 2000)
+            end,
+          })
+        end,
       },
     },
     picker = {
