@@ -14,18 +14,5 @@ return {
         },
       },
     },
-    sources = {
-      providers = {
-        snippets = { enabled = false },
-        lsp = {
-          transform_items = function(_, items)
-            local snippet = require("blink.cmp.types").CompletionItemKind.Snippet
-            return vim.tbl_filter(function(item)
-              return item.kind ~= snippet
-            end, items)
-          end,
-        },
-      },
-    },
   },
 }
