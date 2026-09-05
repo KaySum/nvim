@@ -28,6 +28,40 @@ local function setup_conflict_diagnostics()
   })
 end
 
+-- Bind the bracket motions per buffer, so `]x`/`[x` stay free everywhere except files that
+-- actually have conflicts, the way LazyVim scopes gitsigns' `]h`/`[h`.
+local function setup_conflict_nav()
+  local grp = vim.api.nvim_create_augroup("git_conflict_nav", { clear = true })
+  -- Both events fire on every reparse, not just on transitions, so track what is already bound.
+  local function apply(active)
+    return function()
+      local buf = vim.api.nvim_get_current_buf()
+      if vim.b[buf].git_conflict_nav == active then
+        return
+      end
+      vim.b[buf].git_conflict_nav = active
+      for lhs, dir in pairs({ ["]x"] = "Next", ["[x"] = "Prev" }) do
+        if active then
+          local rhs = ("<cmd>GitConflict%sConflict<cr>"):format(dir)
+          vim.keymap.set("n", lhs, rhs, { buffer = buf, desc = dir .. " Conflict" })
+        else
+          pcall(vim.keymap.del, "n", lhs, { buffer = buf })
+        end
+      end
+    end
+  end
+  vim.api.nvim_create_autocmd("User", {
+    group = grp,
+    pattern = "GitConflictDetected",
+    callback = apply(true),
+  })
+  vim.api.nvim_create_autocmd("User", {
+    group = grp,
+    pattern = "GitConflictResolved",
+    callback = apply(false),
+  })
+end
+
 -- git-conflict paints onto the focused buffer rather than the one it parsed, so redrawing a
 -- conflicted buffer behind a float (lazygit mid-rebase) stamps the markers over that float.
 local function patch_conflict_paint_target()
@@ -84,6 +118,7 @@ return {
     init = function()
       patch_conflict_paint_target()
       setup_conflict_diagnostics()
+      setup_conflict_nav()
       setup_conflict_refresh()
     end,
     keys = {
