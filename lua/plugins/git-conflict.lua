@@ -83,13 +83,14 @@ local function patch_conflict_paint_target()
   end
 end
 
--- git-conflict's watcher misses merge/rebase conflicts; when a reload brings in
--- markers, re-check and repaint twice as its async refresh lands.
+-- git-conflict samples git state on its own schedule and can miss the buffer in front of you;
+-- GitConflictRefresh re-checks from that buffer's own path, so fire it when markers show up.
 local function setup_conflict_refresh()
-  vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  vim.api.nvim_create_autocmd({ "BufReadPost", "BufEnter", "FileChangedShellPost" }, {
     group = vim.api.nvim_create_augroup("git_conflict_refresh", { clear = true }),
     callback = function(args)
-      if not has_conflict_markers(args.buf) then
+      -- BufEnter also lands on terminals and pickers, whose contents are not worth scanning.
+      if vim.bo[args.buf].buftype ~= "" or not has_conflict_markers(args.buf) then
         return
       end
       pcall(vim.cmd.GitConflictRefresh)
