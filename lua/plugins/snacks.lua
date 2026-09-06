@@ -1,6 +1,5 @@
 -- lazygit's nvim-remote preset edits with `--remote-tab`; `--remote` reuses the current window, but
 -- lazygit exits async, so we quit it and close its float up front, else the file opens inside it.
--- WARNING: `q` only quits lazygit when no popup has focus, so a stray one can outlive its window.
 local function nvim_remote(fallback, target, line)
   local nv = 'nvim --server "$NVIM" '
   local steps = {
@@ -38,17 +37,42 @@ return {
       lazygit = {
         width = 0.9,
         height = 0.9,
-        -- a hidden lazygit stays alive and keeps piping diffs through delta on every refresh,
-        -- so quit it; the delay lets the nvim-remote edit preset open the file first
         on_buf = function(self)
+          -- on_buf runs on every show and the buffer is reused, so clear to avoid stacking these
+          local group = vim.api.nvim_create_augroup("lazygit_reap_" .. self.buf, { clear = true })
+          -- a hidden lazygit stays alive and keeps piping diffs through delta on every refresh,
+          -- so quit it; the delay lets the nvim-remote edit preset open the file first
+          -- NOTE: both delays are tuned guesses; stricter would be sequencing the 2s on the edit
+          -- preset actually finishing, and polling the job rather than assuming 1s is enough to quit
           vim.api.nvim_create_autocmd("BufHidden", {
+            group = group,
             buffer = self.buf,
             callback = function()
               vim.defer_fn(function()
-                if self:buf_valid() and vim.fn.bufwinid(self.buf) == -1 then
-                  vim.api.nvim_chan_send(vim.b[self.buf].terminal_job_id, "q")
+                if not self:buf_valid() or vim.fn.bufwinid(self.buf) ~= -1 then
+                  return
                 end
+                vim.api.nvim_chan_send(vim.b[self.buf].terminal_job_id, "q")
+                -- lazygit swallows `q` while a popup has focus, so kill whatever survived it;
+                -- a clean quit has wiped the buffer via TermClose by now, so this only hits strays.
+                -- WARNING: killing skips lazygit's state.yml write, losing its recent repos and command history
+                vim.defer_fn(function()
+                  if self:buf_valid() and vim.fn.bufwinid(self.buf) == -1 then
+                    self:close()
+                  end
+                end, 1000)
               end, 2000)
+            end,
+          })
+          -- snacks drops its own TermClose handler on hide, so a lazygit that quits while hidden
+          -- would leave a dead buffer for the cached terminal to reuse on the next open
+          vim.api.nvim_create_autocmd("TermClose", {
+            group = group,
+            buffer = self.buf,
+            callback = function()
+              if vim.fn.bufwinid(self.buf) == -1 then
+                self:close()
+              end
             end,
           })
         end,
