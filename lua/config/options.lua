@@ -21,3 +21,6 @@ vim.opt.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * tab_width --
 vim.opt.swapfile = false
 
 vim.opt.showtabline = 2 -- always show the bufferline/tabline; bufferline's auto-toggle is off (see plugins/bufferline.lua), so we own this value
+
+vim.opt.title = true -- Let nvim set the terminal's title
+vim.opt.titlestring = "nvim - %{fnamemodify(getcwd(), ':t')}" -- i.e. "nvim - <cwd folder name>"
