@@ -22,6 +22,8 @@ vim.opt.swapfile = false
 
 vim.opt.splitkeep = "cursor" -- scroll the view when a split resizes the window, to keep the cursor on its line
 
+vim.opt.diffopt:append("algorithm:histogram")
+
 vim.opt.showtabline = 2 -- always show the bufferline/tabline; bufferline's auto-toggle is off (see plugins/bufferline.lua), so we own this value
 
 vim.opt.title = true -- Let nvim set the terminal's title
