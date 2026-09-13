@@ -19,7 +19,7 @@ return {
       { "<leader>gx0", "<cmd>GitConflictChooseNone<cr>", mode = { "n", "x" }, desc = "Choose None" },
       { "<leader>gxn", "<cmd>GitConflictNextConflict<cr>", desc = "Next Conflict" },
       { "<leader>gxp", "<cmd>GitConflictPrevConflict<cr>", desc = "Prev Conflict" },
-      { "<leader>gxq", "<cmd>GitConflictListQf<cr>", desc = "List Conflicts (Quickfix)" },
+      -- { "<leader>gxq", "<cmd>GitConflictListQf<cr>", desc = "List Conflicts (Quickfix)" },
     },
   },
 
