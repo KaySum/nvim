@@ -28,3 +28,5 @@ vim.opt.showtabline = 2 -- always show the bufferline/tabline; bufferline's auto
 
 vim.opt.title = true -- Let nvim set the terminal's title
 vim.opt.titlestring = "nvim - %{fnamemodify(getcwd(), ':t')}" -- i.e. "nvim - <cwd folder name>"
+
+vim.g.root_spec = { ".git", "cwd" } -- LazyVim's default is { "lsp", { ".git", "lua" }, "cwd" }
