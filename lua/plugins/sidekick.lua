@@ -10,12 +10,11 @@ return {
       -- directory of a session that already has one (e.g. reattach).
       local Session = require("sidekick.cli.session")
       local resolve_cwd = Session.cwd
-      ---@diagnostic disable-next-line: duplicate-set-field
-      Session.cwd = function(session)
+      rawset(Session, "cwd", function(session)
         session = session or {}
         session.cwd = session.cwd or LazyVim.root()
         return resolve_cwd(session)
-      end
+      end)
       require("sidekick").setup(opts)
     end,
   },
