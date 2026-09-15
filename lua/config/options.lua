@@ -27,6 +27,6 @@ vim.opt.diffopt:append("algorithm:histogram")
 vim.opt.showtabline = 2 -- always show the bufferline/tabline; bufferline's auto-toggle is off (see plugins/bufferline.lua), so we own this value
 
 vim.opt.title = true -- Let nvim set the terminal's title
-vim.opt.titlestring = "nvim - %{fnamemodify(getcwd(), ':t')}" -- i.e. "nvim - <cwd folder name>"
+vim.opt.titlestring = "nvim - %{fnamemodify(v:lua.LazyVim.root(), ':t')}" -- i.e. "nvim - <root folder name>"
 
 vim.g.root_spec = { ".git", "cwd" } -- LazyVim's default is { "lsp", { ".git", "lua" }, "cwd" }
