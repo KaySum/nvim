@@ -87,7 +87,7 @@ function M.setup()
     vim.api.nvim_buf_set_extmark = set_extmark
 
     if not ok then
-      error(err)
+      error(err, 0)
     end
 
     if shifted then

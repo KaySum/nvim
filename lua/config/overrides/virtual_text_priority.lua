@@ -4,7 +4,7 @@
 local sources = {
   "search_count", -- noice (fixed at ANCHOR_PRIORITY; can't be moved)
   "git_blame", -- gitsigns, via its virt_text_priority option
-  "diagnostics", -- applied by a handler wrapper in plugins/lspconfig.lua (no native priority option)
+  "diagnostics", -- applied by config/overrides/diagnostic_priority.lua, set up from plugins/lspconfig.lua (no native priority option)
 }
 
 local ANCHOR = "search_count" -- folke/noice.nvim's "/" search count [i/n] overlay
