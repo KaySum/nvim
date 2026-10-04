@@ -42,7 +42,7 @@ return {
       },
     },
     styles = {
-      -- NOTE: lazygit's window dimmensions need to be explicitly set if the terminal's window dimmensions are explicitly changed
+      -- NOTE: lazygit's window dimensions need to be explicitly set if the terminal's window dimensions are explicitly changed
       -- otherwise it uses the values from the terminal height/width
       terminal = {
         height = 0.45,
