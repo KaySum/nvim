@@ -99,6 +99,15 @@ return {
               end
             end,
           })
+          -- a wipe drops this terminal from snacks' cache, so the next open builds a new one with its
+          -- own timer; an unclosed uv handle is never collected and its callback pins this object
+          vim.api.nvim_create_autocmd("BufWipeout", {
+            buffer = self.buf,
+            once = true,
+            callback = function()
+              self.reap:close()
+            end,
+          })
         end,
       },
     },
