@@ -70,13 +70,7 @@ return {
     },
     keys = {
       { "-", "<cmd>Oil<cr>", desc = "Explorer Oil (parent dir)" },
-      {
-        "<leader>o",
-        function()
-          toggle_oil()
-        end,
-        desc = "Explorer Oil",
-      },
+      { "<leader>o", toggle_oil, desc = "Explorer Oil" },
       {
         "<leader>O",
         function()
