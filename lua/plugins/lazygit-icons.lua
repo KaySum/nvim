@@ -1,5 +1,10 @@
 return {
   "KaySum/lazygit-icons.nvim",
   dependencies = { "nvim-mini/mini.icons" },
-  opts = {},
+  opts = {
+    only = {
+      ["*.jsx"] = "color",
+      ["package.json"] = "icon",
+    },
+  },
 }
