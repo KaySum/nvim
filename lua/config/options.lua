@@ -17,7 +17,8 @@ vim.opt.wrap = true -- Wrap long lines
 vim.opt.linebreak = true -- Wrap at word boundaries, not mid-word
 vim.opt.breakindent = true -- Wrapped lines continue at the same indent (VS Code style)
 vim.opt.showbreak = "󱞩 " -- Marker at the start of wrapped lines
-vim.opt.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * tab_width -- Indent wrapped lines like VS Code's wrappingIndent: "deepIndent"
+vim.g.wrap_marker_width = vim.fn.strdisplaywidth(vim.o.showbreak)
+vim.opt.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * tab_width - vim.g.wrap_marker_width -- Indent wrapped lines like VS Code's wrappingIndent: "deepIndent"
 
 vim.opt.swapfile = false
 

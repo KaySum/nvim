@@ -18,7 +18,7 @@ return {
           if shift_width == 0 then
             shift_width = vim.bo.tabstop
           end
-          vim.opt_local.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * shift_width
+          vim.opt_local.breakindentopt = "shift:" .. vim.g.wrap_indent_multiplier * shift_width - vim.g.wrap_marker_width
         end,
       })
       -- Format-on-save may reindent the buffer; re-detect so shiftwidth (and the
