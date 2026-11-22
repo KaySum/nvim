@@ -24,19 +24,20 @@ return {
         os = {
           edit = nvim_remote("nvim -- {{filename}}", "{{filename}}"),
           editAtLine = nvim_remote("nvim +{{line}} -- {{filename}}", "{{filename}}", "{{line}}"),
-          openDirInEditor = nvim_remote("nvim -- {{dir}}", "{{dir}}"), -- NOTE: openDirInEditor has not been tested
+          -- NOTE: openDirInEditor has not been tested
           -- editAtLineAndWait stays on the preset: lazygit blocks on it to apply the edited hunk,
           -- so it has to run a nested nvim in the float rather than hand the file off with --remote
+          openDirInEditor = nvim_remote("nvim -- {{dir}}", "{{dir}}"),
         },
       },
     },
     styles = {
-      -- NOTE: lazygit's window dimensions need to be explicitly set if the terminal's window dimensions are explicitly changed
-      -- otherwise it uses the values from the terminal height/width
       terminal = {
         height = 0.45,
       },
       lazygit = {
+        -- NOTE: lazygit's window dimensions need to be explicitly set if the terminal's window dimensions are explicitly changed
+        -- otherwise it uses the values from the terminal height/width
         width = 0.9,
         height = 0.9,
       },
