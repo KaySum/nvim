@@ -7,6 +7,10 @@ vim.keymap.set({ "n", "v" }, "<C-u>", "<C-u>zz", { desc = "Half-page up and cent
 
 vim.keymap.set({ "n", "i", "v" }, "<D-s>", "<cmd>w<cr>", { desc = "Save file" })
 
+-- \V (very nomagic) makes search literal; backspace over it for a regex search
+vim.keymap.set({ "n", "x", "o" }, "/", "/\\V", { desc = "Literal search forward" })
+vim.keymap.set({ "n", "x", "o" }, "?", "?\\V", { desc = "Literal search backward" })
+
 Snacks.toggle({
   name = "Custom Root Spec",
   get = function()

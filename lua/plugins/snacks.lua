@@ -116,6 +116,9 @@ return {
         explorer = {
           auto_close = true,
         },
+        grep = {
+          regex = false, -- <A-r> toggles regex back on
+        },
       },
     },
     dashboard = {
