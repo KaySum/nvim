@@ -61,7 +61,6 @@ return {
         kaysum = {
           layout = {
             width = 0.9,
-            min_width = 80,
             height = 0.9,
             box = "vertical",
             { win = "input", height = 1, border = true, title = "{title} {live} {flags}", title_pos = "center" },
