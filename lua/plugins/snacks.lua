@@ -55,6 +55,35 @@ return {
       },
     },
     picker = {
+      -- Referenced by name so sources can still pick their own preset (e.g. vim.ui.select uses "select")
+      layout = { preset = "kaysum" },
+      layouts = {
+        kaysum = {
+          layout = {
+            width = 0.9,
+            min_width = 80,
+            height = 0.9,
+            box = "vertical",
+            { win = "input", height = 1, border = true, title = "{title} {live} {flags}", title_pos = "center" },
+            { win = "list", height = 0.3, max_height = 8, border = true, footer_pos = "right" },
+            { win = "preview", title = "{preview}", border = true },
+          },
+        },
+      },
+      -- Show the cursor's position in the list's footer; snacks has no built-in option for it.
+      -- NOTE: list.cursor and list:count() are undocumented (read-only use); revisit on bumps.
+      -- BUG: on_change only fires when the highlighted item changes, so the total goes stale
+      -- while results stream in or the filter changes under the same item; it corrects on the next move.
+      on_change = function(picker)
+        local list, win = picker.list, picker.list.win
+        if not win:valid() or not win:has_border() then
+          return
+        end
+        local count = list:count()
+        win.opts.footer = count > 0 and (" %d/%d "):format(list.cursor, count) or ""
+        -- nvim resets footer_pos to "left" unless it's passed alongside the footer
+        vim.api.nvim_win_set_config(win.win, { footer = win.opts.footer, footer_pos = win.opts.footer_pos })
+      end,
       sources = {
         explorer = {
           auto_close = true,
