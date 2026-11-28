@@ -64,7 +64,7 @@ end
 
 function Backend:detach()
   agents = nil
-  vim.system({ "rex", "block", "close", "-s", vim.env.REX_SESSION, self.rex_block })
+  vim.system({ "rex", "block", "close", "-s", vim.env.REX_BLOCK, self.rex_block })
 end
 
 function Backend:is_running()

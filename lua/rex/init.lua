@@ -1,7 +1,7 @@
--- Minimal client for the Rex server this nvim runs in (REX_SESSION / REX_BLOCK).
+-- Minimal client for the Rex server this nvim runs in (REX_BLOCK; its full ID also names the session).
 local M = {}
 
-M.enabled = vim.env.REX_SESSION ~= nil and vim.env.REX_BLOCK ~= nil
+M.enabled = vim.env.REX_BLOCK ~= nil
 
 --- Runs a Rex action (`rex do`) as this nvim's pane and returns its decoded result.
 --- Synchronous unless `on_done` is given. Errors are notified and return nil.
@@ -10,7 +10,7 @@ M.enabled = vim.env.REX_SESSION ~= nil and vim.env.REX_BLOCK ~= nil
 ---@param on_done? fun(res:table)
 ---@return table?
 function M.call(action, args, on_done)
-  local cmd = { "rex", "do", "-s", vim.env.REX_SESSION, "-b", vim.env.REX_BLOCK, "--json", action }
+  local cmd = { "rex", "do", "-b", vim.env.REX_BLOCK, "--json", action }
   if args then
     vim.list_extend(cmd, { "--args", vim.json.encode(args) })
   end
