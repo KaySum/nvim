@@ -40,6 +40,18 @@ return {
         -- otherwise it uses the values from the terminal height/width
         width = 0.9,
         height = 0.9,
+        -- hide when focus moves elsewhere (e.g. <c-.> to sidekick), else the float covers it
+        on_win = function(self)
+          vim.api.nvim_create_autocmd("WinLeave", {
+            group = self.augroup,
+            buffer = self.buf,
+            callback = vim.schedule_wrap(function()
+              if self:valid() and vim.api.nvim_get_current_win() ~= self.win then
+                self:hide()
+              end
+            end),
+          })
+        end,
       },
     },
     picker = {
