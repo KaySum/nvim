@@ -1,8 +1,7 @@
-# nvim-kaysum
+# nvim
 
-Neovim distribution built on top of [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [LazyVim documentation](https://lazyvim.github.io/) to learn more
-about the base setup.
+Neovim config built on top of [LazyVim](https://github.com/LazyVim/LazyVim).
+See the [LazyVim docs](https://lazyvim.github.io/) for the base setup.
 
 ## Install
 
